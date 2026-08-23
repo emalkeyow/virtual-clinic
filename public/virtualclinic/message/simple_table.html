@@ -46,13 +46,30 @@
         document.getElementById('read-modal-link').href = 'message/new?pk=' .concat(pk);
     }
     $(document).ready(function () {
-        $('#message-simple-table').DataTable({
-            "order":[[3,"desc"]],
-            "columnDefs":[
-                {"orderable":false,"targets":[0,1,2]},
-                {"searchable":false,"targets":[2,3]},
-                {"visible":false, "targets":3}
-            ]
-        });
+    $('#message-simple-table').DataTable({
+        "order": [[3, "desc"]],
+        "columnDefs": [
+            { "orderable": false, "targets": [0, 1, 2] },
+            { "searchable": false, "targets": [2, 3] },
+            { "visible": false, "targets": 3 }
+        ],
+        "drawCallback": function(settings) {
+            // Target the button AND any nested elements/text inside it
+            var $paginateBtns = $('#message-simple-table_paginate .paginate_button, #message-simple-table_paginate .paginate_button *');
+            
+            $paginateBtns.css({
+                'background-color': '#084000',
+                'background-image': 'none',
+                'border-color': 'transparent',
+                'color': '#ffff'
+            });
+
+            // Handle disabled opacity specifically on the container
+            $('#message-simple-table_paginate .paginate_button.disabled').css({
+                'opacity': '0.6',
+                'cursor': 'not-allowed'
+            });
+        }
     });
+});
 </script>

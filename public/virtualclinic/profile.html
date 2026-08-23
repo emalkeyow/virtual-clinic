@@ -1,9 +1,103 @@
+<style>
+        /* Panel Headings */
+        .panel-heading,
+        .panel-default > .panel-heading,
+        .panel-primary > .panel-heading,
+        .card-header {
+            background-color: #084000 !important;
+            background-image: none !important;
+            border-color: #084000 !important;
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+
+        .panel-title,
+        .panel-heading h3,
+        .panel-heading h4 {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+
+        /* Button & Sidebar Hover States */
+        .paginate_button:hover,
+        .paginate_button.previous:hover:not(.disabled),
+        .paginate_button.next:hover:not(.disabled),
+        a.paginate_button:hover:not(.disabled),
+        .btn-info:hover,
+        .btn-primary:hover {
+            background-color: #F09217 !important;
+            border-color: #d87f0e !important;
+            color: #ffffff !important;
+        }
+
+        .sidebar a:hover,
+        .nav-sidebar a:hover,
+        #sidebar-wrapper a:hover,
+        .list-group-item:hover {
+            background-color: #F09217 !important;
+            color: #000000 !important;
+        }
+
+        /* Tables & Outer Borders */
+        .table > thead > tr > th,
+        table.dataTable thead th {
+            background-color: #084000 !important;
+            color: #ffffff !important;
+            border-bottom: 2px solid #F09217 !important;
+        }
+
+        .fc-toolbar {
+            background-color: transparent !important;
+        }
+
+        .panel-default,
+        .panel-primary,
+        .panel {
+            border-color: #084000 !important;
+        }
+    </style>
+
+
+
 {% extends "base.html" %}
 {% load app_filters %}
 {% block title %}Overview{% endblock %}
 {% block sidebar_profile %}active{% endblock %}
 {% block body_header %}Welcome {{ user.account }}{% endblock %}
 {% block body %}
+<style>
+    /* 1. Reset Footer Links to Default Theme Styling */
+    a.custom-footer-link,
+    .panel-footer a {
+        color: unset !important;
+        font-weight: normal !important;
+    }
+
+    a.custom-footer-link:hover,
+    .panel-footer a:hover {
+        color: unset !important;
+        text-decoration: underline !important;
+    }
+
+    /* 2. Reset DataTables & Bootstrap Buttons to Default Theme Styling */
+    .paginate_button,
+    .paginate_button.previous,
+    .paginate_button.next,
+    .paginate_button.disabled,
+    a.paginate_button,
+    .btn-info,
+    .btn-info.disabled {
+        background: initial !important;
+        background-color: transparent !important;
+        background-image: none !important;
+        border-color: transparent !important;
+        color: unset !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+        opacity: 1 !important;
+        cursor: pointer !important;
+    }
+</style>
     <p class="lead">Navigate through the VirtualClinic system using the bar on the left-hand side of the browser.</p>
     {% if user.account.role <= 20 %}
         <div class="col-md-7">
@@ -12,7 +106,7 @@
                 <div class="panel-body">
                   {% include "virtualclinic/appointment/appointment_calendar.html" %}
                 </div>
-                <div class="panel-footer"><a href="/appointment/calendar/">For a more detailed schedule view, click here</a></div>
+                <div class="panel-footer"><a href="/appointment/calendar/" style="color: #F09217!important; font-weight: bold;">For a more detailed schedule view, click here</a></div>
             </div>
             <script>
                 $(document).ready(function() {
@@ -56,18 +150,20 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="panel-footer"><a href="/admin/statistics/">For a more detailed statistics view, click here</a></div>
+                <div class="panel-footer"><a href="/admin/statistics/" style="color: #007bff !important; font-weight: bold;">For a more detailed statistics view, click here</a></div>
             </div>
         </div>
         <div class="col-md-6">
     {% else %}
-        <div class="col-md-6">
+        <div class="col-md-6">in
     {% endif %}
         <div class="panel panel-primary">
             <div class="panel-heading">Recent messages</div>
             <div class="panel-body">
                 {% include "virtualclinic/message/simple_table.html" %}
             </div>
-        <div class="panel-footer"><a href="/message/list/">For a more detailed message view, click here</a></div>
+        <div class="panel-footer"><a href="/message/list/" style="color: #F09217 !important; font-weight: bold;">For a more detailed message view, click here</a></div>
     </div>
+
+   
 {% endblock %}

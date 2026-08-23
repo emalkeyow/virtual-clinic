@@ -19,7 +19,318 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.8.2/fullcalendar.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+
+    <style>
+        /* -------------------------------------------------------------
+           1. TOP NAVIGATION BAR
+           ------------------------------------------------------------- */
+        .navbar,
+        .navbar-inverse,
+        .navbar-default,
+        .navbar-static-top {
+            background-color: #084000 !important;
+            background-image: none !important;
+            border-color: #F09217 !important;
+        }
+
+        .navbar-brand,
+        .navbar-nav > li > a,
+        .navbar-default .navbar-nav > li > a {
+            color: #ffffff !important;
+        }
+
+        .navbar-nav > li > a:hover,
+        .navbar-nav > li > a:focus,
+        .navbar-default .navbar-nav > li > a:hover {
+            background-color: #063000 !important;
+            color: #F09217 !important;
+        }
+
+        .navbar-brand {
+    color: #ffffff !important;
+    font-family: 'Poppins', 'Montserrat', sans-serif !important; /* <--- Add your font here */
+    font-size: 22px !important;
+    font-weight: 600 !important;
+}
+
+.navbar-nav > li > a,
+.navbar-default .navbar-nav > li > a {
+    color: #ffffff !important;
+}
+
+        .dropdown-menu {
+            background-color: #084000 !important;
+        }
+
+        .dropdown-menu > li > a {
+            color: #ffffff !important;
+        }
+
+        .dropdown-menu > li > a:hover {
+            background-color: #063000 !important;
+            color: #F09217 !important;
+        }
+
+        /* -------------------------------------------------------------
+           2. BODY & MAIN CONTENT BACKGROUND (SET TO WHITE)
+           ------------------------------------------------------------- */
+        body,
+        .wrapper,
+        .main,
+        .container-fluid.main {
+            background-color: #ffffff !important;
+        }
+
+        /* Dark text on white background for high readability */
+        .page-header,
+        .main h1,
+        .main h1.page-header {
+            color: #084000 !important; /* Forest Green Header */
+            border-bottom: 2px solid #F09217 !important; /* Gold accent line */
+        }
+
+        .main p,
+        .main text,
+        body {
+            color: #333333 !important; /* Dark grey for body text */
+        }
+
+        /* -------------------------------------------------------------
+           3. SIDEBAR BASE & OVERRIDES
+           ------------------------------------------------------------- */
+        .sidebar,
+        .main-sidebar,
+        .nav-sidebar,
+        #sidebar-wrapper,
+        .left-side {
+            background-color: #084000 !important;
+        }
+
+        /* Base Sidebar Links */
+        .sidebar a,
+        .sidebar .nav > li > a,
+        .nav-sidebar > li > a,
+        #sidebar-wrapper a,
+        .list-group-item {
+            background-color: #084000 !important;
+            color: #ffffff !important;
+        }
+
+        /* Active & Hover Sidebar Links */
+        .sidebar .nav > li > a:hover,
+        .sidebar .nav > li > a:focus,
+        .sidebar .nav > li.active > a,
+        .sidebar .nav > li.active > a:hover,
+        .sidebar .nav > li.active > a:focus,
+        .nav-sidebar > li > a:hover,
+        .nav-sidebar > li.active > a,
+        #sidebar-wrapper a:hover,
+        #sidebar-wrapper a.active,
+        .list-group-item:hover,
+        .list-group-item.active {
+            background-color: #052800 !important; /* Darker Forest Green */
+            color: #F09217 !important;            /* Gold Text */
+            border-left: 4px solid #F09217 !important; /* Gold Accent Strip */
+        }
+
+        .sidebar .nav > li > a:hover i,
+        .sidebar .nav > li.active > a i,
+        .nav-sidebar > li > a:hover i,
+        .nav-sidebar > li.active > a i {
+            color: #F09217 !important;
+        }
+
+        /* -------------------------------------------------------------
+           4. PANEL HEADINGS & CARDS
+           ------------------------------------------------------------- */
+        .panel-heading,
+        .panel-default > .panel-heading,
+        .panel-primary > .panel-heading,
+        .card-header,
+        .box-header,
+        .widget-header {
+            background-color: #084000 !important; /* Forest Green Background */
+            color: #ffffff !important;            /* White Text */
+            border-bottom: 2px solid #F09217 !important; /* Optional Gold Line Accent */
+        }
+
+        .panel-title,
+        .panel-heading h3,
+        .panel-heading h4 {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+
+        .panel-default,
+        .panel-primary,
+        .panel {
+            border-color: #084000 !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* -------------------------------------------------------------
+           5. TABLES & BUTTONS
+           ------------------------------------------------------------- */
+        .table > thead > tr > th,
+        table.dataTable thead th {
+            background-color: #084000 !important;
+            color: #ffffff !important;
+            border-bottom: 2px solid #F09217 !important;
+        }
+
+        .paginate_button:hover,
+        .paginate_button.previous:hover:not(.disabled),
+        .paginate_button.next:hover:not(.disabled),
+        a.paginate_button:hover:not(.disabled),
+        .btn-info:hover,
+        .btn-primary:hover {
+            background-color: #F09217 !important;
+            border-color: #d87f0e !important;
+            color: #ffffff !important;
+        }
+
+        /* -------------------------------------------------------------
+           6. FULLCALENDAR EVENT STYLING
+           ------------------------------------------------------------- */
+        .fc-toolbar {
+            background-color: transparent !important;
+        }
+
+        .fc-event, 
+        .fc-event-dot {
+            background-color: #01053b !important; /* Amber/Gold for calendar events */
+            border-color: #d87f0e !important;
+            color: #ffffff !important;
+        }
+
+        .fc-event .fc-content {
+            color: #ffffff !important;
+            font-weight: 600;
+        }
+
+        /* -------------------------------------------------------------
+           7. BUTTONS, TABS & PAGINATION OVERRIDES
+           ------------------------------------------------------------- */
+        /* Primary / Info Buttons (e.g. "New message") */
+        .btn-primary, 
+        .btn-info,
+        a.btn-primary,
+        a.btn-info {
+            background-color: #084000 !important;
+            border-color: #052800 !important;
+            color: #ffffff !important;
+        }
+
+        .btn-primary:hover, 
+        .btn-info:hover,
+        a.btn-primary:hover,
+        a.btn-info:hover {
+            background-color: #F09217 !important; /* Gold on hover */
+            border-color: #d87f0e !important;
+            color: #ffffff !important;
+        }
+
+        /* Nav Tabs (Received, Sent, Archived Messages) */
+        .nav-tabs > li > a {
+            color: #084000 !important; /* Forest green inactive text */
+            font-weight: 600;
+        }
+
+        .nav-tabs > li > a:hover {
+            color: #F09217 !important; /* Gold hover text */
+            background-color: #f8f9fa !important;
+        }
+
+        .nav-tabs > li.active > a, 
+        .nav-tabs > li.active > a:hover, 
+        .nav-tabs > li.active > a:focus {
+            color: #084000 !important;
+            border-top: 3px solid #F09217 !important; /* Active gold indicator */
+            font-weight: bold;
+        }
+
+        /* DataTables Pagination ("Previous" and "Next" Buttons) */
+        .dataTables_wrapper .dataTables_paginate .paginate_button,
+        .paginate_button {
+            background-color: #084000 !important;
+            border: 1px solid #052800 !important;
+            color: #ffffff !important;
+            border-radius: 4px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover,
+        .paginate_button:hover:not(.disabled) {
+            background-color: #F09217 !important; /* Gold hover */
+            border-color: #d87f0e !important;
+            color: #ffffff !important;
+        }
+
+        /* Disabled Pagination Buttons */
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+            background-color: #cccccc !important;
+            border-color: #cccccc !important;
+            color: #666666 !important;
+            cursor: not-allowed;
+        }
+/* Target DataTables / Bootstrap Pagination ("Previous" & "Next") */
+        .pagination > li > a,
+    .pagination > li > span,
+    .paging_simple_numbers .paginate_button,
+    .dataTables_paginate .paginate_button,
+    .paginate_button {
+    background-color: #084000 !important;
+    background-image: none !important;
+    border: 1px solid #F09217 !important;
+    color: #ffffff !important;
+}
+.pagination > li > a:hover,
+.pagination > li > span:hover,
+.dataTables_paginate .paginate_button:hover,
+.paginate_button:hover:not(.disabled) {
+    background-color: #F09217 !important; /* Gold on hover */
+    border-color: #d87f0e !important;
+    color: #ffffff !important;
+}
+
+/* Target "New message" button directly across all possible Bootstrap btn classes */
+.btn,
+.btn-success,
+.btn-info,
+.btn-primary,
+a.btn,
+a.btn-success,
+a.btn-info,
+a.btn-primary {
+    background-color: #084000 !important;
+    background-image: none !important;
+    border-color: #F09217 !important;
+    color: #ffffff !important;
+}
+
+/* Remove DataTables outer grey container styling */
+div.dataTables_wrapper .dataTables_paginate .paginate_button,
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover,
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 2px !important;
+    box-shadow: none !important;
+}
+
+/* Ensure inner links/buttons carry the clean green style without extra padding */
+.dataTables_paginate .paginate_button a,
+.pagination > li > a {
+    border-radius: 6px !important;
+    padding: 6px 12px !important;
+}
+    </style>
+
 </head>
+
+
 <body>
     <nav class="navbar navbar-default navbar-static-top">
         <div class="container-fluid">
@@ -110,7 +421,7 @@
             {% endif %}
                 <h1 class="page-header">{% block body_header %}{% endblock %}</h1>
                 {% if alert_success %}
-                    <div class="alert alert-success alert-dismissible fade in" role="alert">
+                    <div class="alert alert-success alert-dismissible fade in" role="alert" style="background-color: #084000 !important; color: #ffffff !important; border-color: #F09217 !important;">
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
                         {{ alert_success }}
                     </div>
