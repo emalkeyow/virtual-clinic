@@ -165,6 +165,7 @@ class ProfileForm(BasicForm):
         profile.speciality = self.cleaned_data['speciality']
 
 
+
 class AppointmentForm(BasicForm):
     description = forms.CharField(required=True, max_length=50)
     setup_field(description, 'Enter description here')
@@ -181,9 +182,9 @@ class AppointmentForm(BasicForm):
     appointment_type = forms.ChoiceField(choices=APPOINTMENT_TYPE)
     setup_field(appointment_type)
 
-    slot = forms.IntegerField(widget=forms.HiddenInput())
 # REPLACED manual startTime and endTime with a single slot choice field
     slot = forms.IntegerField(widget=forms.HiddenInput())
+
 
     def assign(self, appointment, selected_slot,patient_account):
         appointment.description = self.cleaned_data['description']
@@ -223,6 +224,13 @@ class AppointmentForm(BasicForm):
             if endTime<=startTime:
                 self.mark_error('endTime', 'The appointment end time must come after the start time')
         return cleaned_data
+
+class WalkInAppointmentForm(AppointmentForm):
+    patient = forms.ModelChoiceField(
+        queryset=Account.objects.filter(role=Account.ACCOUNT_PATIENT),
+        label="Select Patient",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
 
 
 class SpecialityForm(BasicForm):
@@ -475,3 +483,4 @@ class StatisticsForm(BasicForm):
     def assign(self,statistics):
         statistics.startTime = self.cleaned_data['startDate']
         statistics.endTime = self.cleaned_data['endDate']
+

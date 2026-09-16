@@ -9,27 +9,40 @@ from server import appointment
 from server import logger
 from server import message
 
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
+
+from server.models import Account, Appointment, ScheduleSlot
+from server.forms import WalkInAppointmentForm
+from server import views
+
 
 def list_view(request):
-    # Authentication check
+    # 1. Add Account.ACCOUNT_ADMIN to allowed roles
     authentication_result = views.authentication_check(
         request,
-        [Account.ACCOUNT_PATIENT, Account.ACCOUNT_DOCTOR]
+        [Account.ACCOUNT_PATIENT, Account.ACCOUNT_DOCTOR, Account.ACCOUNT_ADMIN]
     )
     if authentication_result is not None:
         return authentication_result
+
     # Get template data from session
     template_data = views.parse_session(request)
+
     # Proceed with rest of the view
     appointment.parse_appointment_cancel(request, template_data)     # parse appointment cancelling
+
+    # 2. Filter query based on role
     if request.user.account.role == Account.ACCOUNT_DOCTOR:
         template_data['query'] = Appointment.objects.filter(doctor=request.user.account)
-    elif request.user.account == Account.ACCOUNT_PATIENT:
+    elif request.user.account.role == Account.ACCOUNT_PATIENT:
         template_data['query'] = Appointment.objects.filter(patient=request.user.account)
     else:
+        # Admins (role 30) reach this branch and view all system appointments
         template_data['query'] = Appointment.objects.all()
-    return render(request, 'virtualclinic/appointment/list.html', template_data)
 
+    return render(request, 'virtualclinic/appointment/list.html', template_data)
 
 def calendar_view(request):
     # Authentication check
@@ -161,3 +174,38 @@ def create_view(request):
         form.disable_field('doctor')
     template_data['form'] = form
     return render(request, 'virtualclinic/appointment/create.html',template_data)
+
+@login_required
+def appointment_walkin_view(request):
+    # Enforce staff/admin access check
+    if request.user.account.role not in [Account.ACCOUNT_ADMIN, Account.ACCOUNT_DOCTOR]:
+        return HttpResponseRedirect('/error/denied/')
+
+    template_data = views.parse_session(request, {'form_button': "Create Walk-in Appointment"})
+
+    if request.method == 'POST':
+        form = WalkInAppointmentForm(request.POST)
+        if form.is_valid():
+            # Get selected patient and slot from the form
+            patient_account = form.cleaned_data['patient']
+            slot_id = form.cleaned_data['slot']
+            selected_slot = get_object_or_404(ScheduleSlot, id=slot_id, is_booked=False)
+
+            # Generate appointment assigned to the SELECTED patient
+            appointment = form.generate(selected_slot, patient_account=patient_account)
+            appointment.save()
+
+            # Reserve the slot
+            selected_slot.is_booked = True
+            selected_slot.save()
+
+            request.session['alert_success'] = f"Appointment successfully scheduled for {patient_account}!"
+            return HttpResponseRedirect('/appointment/list/')
+    else:
+        form = WalkInAppointmentForm()
+
+    template_data['form'] = form
+    template_data['available_slots'] = ScheduleSlot.objects.filter(is_booked=False).order_by('date', 'start_time')
+    
+    # Updated template path to use your existing HTML file:
+    return render(request, 'virtualclinic/create_appointment.html', template_data)

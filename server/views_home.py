@@ -182,3 +182,47 @@ def appointment_create_view(request):
     template_data['form'] = form
     template_data['available_slots'] = ScheduleSlot.objects.filter(is_booked=False).order_by('date', 'start_time')
     return render(request, 'virtualclinic/create_appointment.html', template_data)
+
+
+@login_required
+def profile_view(request):
+    # Get template data from session
+    template_data = views.parse_session(request)
+    
+    # Get current logged-in user's Account model
+    user_account = request.user.account
+
+    # Filter appointments based on user role
+    if user_account.role == Account.ACCOUNT_DOCTOR:
+        appointments = Appointment.objects.filter(doctor=user_account)
+    elif user_account.role == Account.ACCOUNT_PATIENT:
+        appointments = Appointment.objects.filter(patient=user_account)
+    else:
+        # Admins or other roles can view all appointments
+        appointments = Appointment.objects.all()
+
+    template_data['appointments'] = appointments
+    return render(request, 'public/profile.html', template_data)
+
+@login_required
+def calendar_events_view(request):
+    user_account = request.user.account
+
+    # Ensure query targets only the active account's appointments
+    if user_account.role == Account.ACCOUNT_PATIENT:
+        appointments = Appointment.objects.filter(patient=user_account)
+    elif user_account.role == Account.ACCOUNT_DOCTOR:
+        appointments = Appointment.objects.filter(doctor=user_account)
+    else:
+        appointments = Appointment.objects.all()
+
+    # Format into JSON expected by FullCalendar
+    events = []
+    for appt in appointments:
+        events.append({
+            'title': f"{appt.symptom.name} - {appt.doctor}",
+            'start': appt.startTime.isoformat(),
+            'end': appt.endTime.isoformat(),
+        })
+
+    return JsonResponse(events, safe=False)

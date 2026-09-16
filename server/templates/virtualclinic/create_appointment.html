@@ -32,6 +32,29 @@
     font-weight: bold;
     box-shadow: 0 0 0 2px #059669;
   }
+
+  /* Schedule Slot Button Base Style */
+.slot-btn {
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    background-color: #ffffff;
+}
+
+.slot-btn:hover {
+    border-color: #3b82f6;
+    background-color: #f0f9ff;
+}
+
+/* Selected State matched to your JS class */
+.slot-btn.selected {
+    border-color: #2563eb;
+    background-color: #dbeafe;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
 </style>
 
 <div class="container" style="max-width: 600px; margin: 40px auto;">
@@ -81,7 +104,7 @@
       {% if available_slots %}
         <div class="slots-grid">
           {% for slot in available_slots %}
-            <div class="slot-btn" onclick="selectSlot(this, {{ slot.id }})">
+            <div class="slot-btn" onclick="selectSlot(this, '{{ slot.id }}')">
               <div><strong>{{ slot.date|date:"M d, Y" }}</strong></div>
               <div style="font-size: 0.9em; margin-top: 4px;">
                 {{ slot.start_time|time:"h:i A" }} - {{ slot.end_time|time:"h:i A" }}

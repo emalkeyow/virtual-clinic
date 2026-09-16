@@ -1,6 +1,8 @@
 from django.urls import re_path
 from django.conf.urls.static import static
 from django.conf import settings
+from django.contrib import admin
+from django.urls import path, include
 
 from server import views
 from server import views_home
@@ -25,31 +27,32 @@ urlpatterns = [
     re_path(r'^error/denied/$', views_home.error_denied_view, name='error/denied'),
 
     re_path(r'^admin/users/$', views_admin.users_view, name='admin/users'),
-    re_path(r'^admin/archive_user', views_admin.user_archive, name='admin/archive_user'),
-    re_path(r'^admin/archived_users', views_admin.view_archived_users, name='admin/archived_users'),
-    re_path(r'^admin/restore_users', views_admin.restore_user, name='admin/restore_users'),
+    re_path(r'^admin/archive_user/$', views_admin.user_archive, name='admin/archive_user'),
+    re_path(r'^admin/archived_users/$', views_admin.view_archived_users, name='admin/archived_users'),
+    re_path(r'^admin/restore_users/$', views_admin.restore_user, name='admin/restore_users'),
     re_path(r'^admin/activity/$', views_admin.activity_view, name='admin/activity'),
     re_path(r'^admin/statistics/$', views_admin.statistic_view, name='admin/statistics'),
     re_path(r'^admin/speciality/$', views_admin.view_speciality, name='admin/speciality'),
     re_path(r'^admin/add_speciality/$', views_admin.add_speciality, name='admin/add_speciality'),
-    re_path(r'^admin/delete_speciality', views_admin.parse_speciality_delete, name='admin/delete_speciality'),
+    re_path(r'^admin/delete_speciality/$', views_admin.parse_speciality_delete, name='admin/delete_speciality'),
     re_path(r'^admin/symptom/$', views_admin.view_symptom, name='admin/symptom'),
     re_path(r'^admin/add_symptom/$', views_admin.add_symptom, name='admin/add_symptom'),
-    re_path(r'^admin/delete_symptom', views_admin.parse_symptom_delete, name='admin/delete_symptom'),
+    re_path(r'^admin/delete_symptom/$', views_admin.parse_symptom_delete, name='admin/delete_symptom'),
     re_path(r'^admin/createemployee/$', views_admin.createemployee_view, name='admin/createemployee'),
     re_path(r'^admin/add_hospital/$', views_admin.add_hospital_view, name='admin/add_hospital'),
     re_path(r'^admin/import/$', views_admin.csv_import_view, name='admin/import'),
     re_path(r'^admin/export/$', views_admin.csv_export_view, name='admin/export'),
     re_path(r'^admin/backup/$', views_admin.backup_data, name='admin/backup'),
 
-    re_path(r'^message/list/', views_message.list_view, name='message/list'),
-    re_path(r'^message/new/', views_message.new_view, name='message/new'),
+    re_path(r'^message/list/$', views_message.list_view, name='message/list'),
+    re_path(r'^message/new/$', views_message.new_view, name='message/new'),
 
     re_path(r'^appointment/list/$', views_appointment.list_view, name='appointment/list'),
     re_path(r'^appointment/calendar/$', views_appointment.calendar_view, name='appointment/calendar'),
     re_path(r'^appointment/update/$', views_appointment.update_view, name='appointment/update'),
     re_path(r'^appointment/create/$', views_home.appointment_create_view, name='appointment/create'),
     re_path(r'^api/appointments/all/$', views_api.appointment_views, name='api/appointment/all'),
+    re_path(r'^appointment/walkin/$', views_appointment.appointment_walkin_view, name='appointment/walkin'),
     
 
     re_path(r'^profile/$', views_profile.profile_view, name='profile'),
