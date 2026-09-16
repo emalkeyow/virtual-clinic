@@ -48,8 +48,9 @@ urlpatterns = [
     re_path(r'^appointment/list/$', views_appointment.list_view, name='appointment/list'),
     re_path(r'^appointment/calendar/$', views_appointment.calendar_view, name='appointment/calendar'),
     re_path(r'^appointment/update/$', views_appointment.update_view, name='appointment/update'),
-    re_path(r'^appointment/create/$', views_appointment.create_view, name='appointment/create'),
+    re_path(r'^appointment/create/$', views_home.appointment_create_view, name='appointment/create'),
     re_path(r'^api/appointments/all/$', views_api.appointment_views, name='api/appointment/all'),
+    
 
     re_path(r'^profile/$', views_profile.profile_view, name='profile'),
     re_path(r'^profile/update/$', views_profile.update_view, name='profile/update'),

@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from django import forms
 from django.contrib.auth.models import User
@@ -167,42 +167,49 @@ class ProfileForm(BasicForm):
 
 class AppointmentForm(BasicForm):
     description = forms.CharField(required=True, max_length=50)
-    setup_field(description,'Enter description here')
+    setup_field(description, 'Enter description here')
+
     symptom = forms.ModelChoiceField(queryset=Symptom.objects.all())
     setup_field(symptom)
+
     hospital = forms.ModelChoiceField(queryset=Hospital.objects.all())
     setup_field(hospital)
+
     doctor = forms.ModelChoiceField(queryset=Account.objects.filter(role=Account.ACCOUNT_DOCTOR))
     setup_field(doctor)
-    patient = forms.ModelChoiceField(queryset=Account.objects.filter(role=Account.ACCOUNT_PATIENT))
-    setup_field(patient)
+
     appointment_type = forms.ChoiceField(choices=APPOINTMENT_TYPE)
     setup_field(appointment_type)
-    startTime = forms.DateTimeField(label="Start Time")
-    setup_field(startTime, "Enter as YYYY-MM-DD HH:MM")
-    endTime = forms.DateTimeField(label="End Time")
-    setup_field(endTime, "Enter as YYYY-MM-DD HH:MM")
 
-    def assign(self, appointment):
+    slot = forms.IntegerField(widget=forms.HiddenInput())
+# REPLACED manual startTime and endTime with a single slot choice field
+    slot = forms.IntegerField(widget=forms.HiddenInput())
+
+    def assign(self, appointment, selected_slot,patient_account):
         appointment.description = self.cleaned_data['description']
         appointment.symptom = self.cleaned_data['symptom']
         appointment.hospital = self.cleaned_data['hospital']
         appointment.doctor = self.cleaned_data['doctor']
         appointment.patient = self.cleaned_data['patient']
         appointment.appointment_type = self.cleaned_data['appointment_type']
-        appointment.startTime = self.cleaned_data['startTime']
-        appointment.endTime = self.cleaned_data['endTime']
 
-    def generate(self):
+        # Map date and times directly from the selected ScheduleSlot model instance
+        appointment.startTime = selected_slot.start_time
+        appointment.endTime = selected_slot.end_time
+
+    def generate(self, selected_slot, patient_account):
+        combined_start = datetime.combine(selected_slot.date, selected_slot.start_time)
+        combined_end = datetime.combine(selected_slot.date, selected_slot.end_time)
+
         return Appointment(
             doctor=self.cleaned_data['doctor'],
-            patient=self.cleaned_data['patient'],
+            patient=patient_account,
             description=self.cleaned_data['description'],
             symptom=self.cleaned_data['symptom'],
             hospital=self.cleaned_data['hospital'],
-            appointment_type = self.cleaned_data['appointment_type'],
-            startTime=self.cleaned_data['startTime'],
-            endTime=self.cleaned_data['endTime']
+            appointment_type=self.cleaned_data['appointment_type'],
+            startTime=combined_start.isoformat(),
+            endTime=combined_end.isoformat()
         )
     """
     This is a validator that checks if the appointment is conflicting with any other already

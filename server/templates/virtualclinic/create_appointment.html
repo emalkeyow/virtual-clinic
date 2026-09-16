@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<style>
+  .slots-container {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  .slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+  }
+  .slot-btn {
+    padding: 12px;
+    border: 2px solid #cbd5e1;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease-in-out;
+  }
+  .slot-btn:hover {
+    border-color: #2563eb;
+    background-color: #eff6ff;
+  }
+  .slot-btn.selected {
+    border-color: #059669;
+    background-color: #d1fae5;
+    color: #065f46;
+    font-weight: bold;
+    box-shadow: 0 0 0 2px #059669;
+  }
+</style>
+
+<div class="container" style="max-width: 600px; margin: 40px auto;">
+  <h2>Create Appointment</h2>
+  <hr>
+
+  <form method="POST" id="appointment-form">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label for="{{ form.description.id_for_label }}">Description</label>
+      {{ form.description }}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.symptom.id_for_label }}">Symptom</label>
+      {{ form.symptom }}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.hospital.id_for_label }}">Hospital</label>
+      {{ form.hospital }}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.doctor.id_for_label }}">Doctor</label>
+      {{ form.doctor }}
+    </div>
+
+    <!-- <div class="form-group">
+      <label for="{{ form.patient.id_for_label }}">Patient</label>
+      {{ form.patient }}
+    </div> -->
+
+    <div class="form-group">
+      <label for="{{ form.appointment_type.id_for_label }}">Appointment Type</label>
+      {{ form.appointment_type }}
+    </div>
+
+    <!-- Hidden field for selected slot ID -->
+    {{ form.slot }}
+
+    <!-- Available Schedule Slots Grid -->
+    <div class="form-group slots-container">
+      <label><strong>Select Available Time Slot:</strong></label>
+      
+      {% if available_slots %}
+        <div class="slots-grid">
+          {% for slot in available_slots %}
+            <div class="slot-btn" onclick="selectSlot(this, {{ slot.id }})">
+              <div><strong>{{ slot.date|date:"M d, Y" }}</strong></div>
+              <div style="font-size: 0.9em; margin-top: 4px;">
+                {{ slot.start_time|time:"h:i A" }} - {{ slot.end_time|time:"h:i A" }}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p style="color: #dc2626; margin-top: 10px;">
+          No unbooked slots currently available. Please check back later.
+        </p>
+      {% endif %}
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 10px; font-size: 16px;">
+      {{ form_button|default:"Create Appointment" }}
+    </button>
+  </form>
+</div>
+
+<script>
+  function selectSlot(element, slotId) {
+    document.querySelectorAll('.slot-btn').forEach(btn => btn.classList.remove('selected'));
+    element.classList.add('selected');
+    document.getElementById('id_slot').value = slotId;
+  }
+
+  document.getElementById('appointment-form').onsubmit = function(e) {
+    const slotInput = document.getElementById('id_slot');
+    if (!slotInput || !slotInput.value) {
+      e.preventDefault();
+      alert('Please select an available appointment slot before submitting.');
+    }
+  };
+</script>
+{% endblock %}

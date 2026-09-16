@@ -1,6 +1,7 @@
 from django.contrib import admin
 from server.models import Location, Hospital , Account, Profile, Action, Appointment, MedicalTest
-
+from django.contrib import admin
+from server.models import ScheduleSlot
 
 class LocationAdmin(admin.ModelAdmin):
     fields = ['city', 'zip', 'state', 'country', 'address']
@@ -92,3 +93,11 @@ class MedicalTestAdmin(admin.ModelAdmin):
 
 
 admin.site.register(MedicalTest, MedicalTestAdmin)
+
+
+@admin.register(ScheduleSlot)
+class ScheduleSlotAdmin(admin.ModelAdmin):
+    list_display = ('doctor', 'date', 'start_time', 'end_time', 'is_booked')
+    list_filter = ('is_booked', 'date', 'doctor')
+    search_fields = ('doctor__user__username', 'doctor__user__first_name', 'doctor__user__last_name')
+    ordering = ('-date', 'start_time')

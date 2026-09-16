@@ -1,9 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
-from server.forms import LoginForm, AccountRegisterForm
-from server.models import Account, Action
+from server.forms import LoginForm, AccountRegisterForm, AppointmentForm
+from server.models import Account, Action, Appointment, ScheduleSlot
 from server import views
 from server import logger
 
@@ -13,7 +14,7 @@ def setup_view(request):
         request.session['alert_success'] = "Setup has already been completed."
         return HttpResponseRedirect('/')
     # Get template data from the session
-    template_data = views.parse_session(request,{'form_button':"Register"})
+    template_data = views.parse_session(request, {'form_button': "Register"})
     # Proceed with rest of the view
     if request.method == 'POST':
         form = AccountRegisterForm(request.POST)
@@ -36,7 +37,7 @@ def setup_view(request):
     else:
         form = AccountRegisterForm()
     template_data['form'] = form
-    return render(request,'virtualclinic/setup.html',template_data)
+    return render(request, 'virtualclinic/setup.html', template_data)
 
 
 def logout_view(request):
@@ -71,27 +72,39 @@ def login_view(request):
         return HttpResponseRedirect('/profile/')
     elif Account.objects.all().count() == 0:
         return HttpResponseRedirect('/setup/')
+    
     # get template data from session
-    template_data = views.parse_session(request,{'form_button':"Login"})
+    template_data = views.parse_session(request, {'form_button': "Login"})
+    
     # Proceed with the rest of view
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
             user = authenticate(
-                username = form.cleaned_data['email'].lower(),
-                password = form.cleaned_data['password']
+                username=form.cleaned_data['email'].lower(),
+                password=form.cleaned_data['password']
             )
-            userInfo = Account.objects.get(user=user)
-            if userInfo.archive == False:
-                login(request,user)
-                logger.log(Action.ACTION_ACCOUNT,"Account login",request.user.account)
-                request.session['alert_success'] = "Successfully logged into VirtualClinic."
-                return HttpResponseRedirect('/profile/')
+            
+            # Check if authentication was successful BEFORE querying Account model
+            if user is not None:
+                try:
+                    userInfo = Account.objects.get(user=user)
+                    if userInfo.archive == False:
+                        login(request, user)
+                        logger.log(Action.ACTION_ACCOUNT, "Account login", request.user.account)
+                        request.session['alert_success'] = "Successfully logged into VirtualClinic."
+                        return HttpResponseRedirect('/profile/')
+                    else:
+                        request.session['alert_danger'] = "Account is archived! Please create a new account"
+                        return HttpResponseRedirect('/register/')
+                except Account.DoesNotExist:
+                    request.session['alert_danger'] = "Account record not found."
             else:
-                request.session['alert_danger'] = "Account is archived! Please create a new account"
-                return HttpResponseRedirect('/register/')
+                # Triggers when username/password doesn't match or account doesn't exist
+                request.session['alert_danger'] = "Invalid email or password."
     else:
         form = LoginForm()
+        
     template_data['form'] = form
     return render(request, 'virtualclinic/login.html', template_data)
 
@@ -113,21 +126,21 @@ def register_view(request):
                 form.cleaned_data['password_first'],
                 form.cleaned_data['firstname'],
                 form.cleaned_data['lastname'],
-                # form.cleaned_data['speciality'],
                 Account.ACCOUNT_PATIENT
             )
             user = authenticate(
-                username = form.cleaned_data['email'].lower(),
-                password = form.cleaned_data['password_first']
+                username=form.cleaned_data['email'].lower(),
+                password=form.cleaned_data['password_first']
             )
             logger.log(Action.ACTION_ACCOUNT, "Account Login", user.account)
-            login(request,user)
+            login(request, user)
             request.session['alert_success'] = "Successfully registered with VirtualClinic."
             return HttpResponseRedirect('/profile/')
     else:
         form = AccountRegisterForm()
     template_data['form'] = form
-    return render(request,'virtualclinic/register.html',template_data)
+    return render(request, 'virtualclinic/register.html', template_data)
+
 
 def error_denied_view(request):
     # Authentication check
@@ -137,4 +150,35 @@ def error_denied_view(request):
     # Get template data from session
     template_data = views.parse_session(request)
     # Proceed with rest of the view
-    return render(request,'virtualclinic/error/denied.html',template_data)
+    return render(request, 'virtualclinic/error/denied.html', template_data)
+
+
+@login_required
+def appointment_create_view(request):
+    # Get template data from session
+    template_data = views.parse_session(request, {'form_button': "Create Appointment"})
+    
+    if request.method == 'POST':
+        form = AppointmentForm(request.POST)
+        if form.is_valid():
+            slot_id = form.cleaned_data['slot']
+            selected_slot = get_object_or_404(ScheduleSlot, id=slot_id, is_booked=False)
+
+
+
+            # Pass the logged-in user's account to generate()
+            appointment = form.generate(selected_slot, patient_account=request.user.account)
+            appointment.save()
+
+            # Reserve the slot so it can't be booked again
+            selected_slot.is_booked = True
+            selected_slot.save()
+
+            request.session['alert_success'] = "Appointment successfully booked!"
+            return HttpResponseRedirect('/profile/')
+    else:
+        form = AppointmentForm()
+
+    template_data['form'] = form
+    template_data['available_slots'] = ScheduleSlot.objects.filter(is_booked=False).order_by('date', 'start_time')
+    return render(request, 'virtualclinic/create_appointment.html', template_data)

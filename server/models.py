@@ -395,3 +395,14 @@ class Statistics(models.Model):
             'endDate':self.endDate,
         }
         return fields
+
+
+class ScheduleSlot(models.Model):
+    doctor = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='slots')
+    date = models.DateField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    is_booked = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.doctor} | {self.date} ({self.start_time.strftime('%H:%M')} - {self.end_time.strftime('%H:%M')})"
