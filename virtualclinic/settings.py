@@ -150,3 +150,9 @@ STATIC_URL = '/static/'
 #STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"),]
 
 STATICFILES_STORAGE='whitenoise.django.GzipManifestStaticFilesStorage'
+
+# Redirect unauthenticated users to the home/login view ('/') instead of default '/accounts/login/'
+LOGIN_URL = '/'
+
+# Expire session cookies when the browser tab or window closes
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True

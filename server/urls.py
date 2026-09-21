@@ -24,6 +24,7 @@ urlpatterns = [
     re_path(r'^register/$', views_home.register_view, name='register'),
     re_path(r'^setup/$', views_home.setup_view, name='setup'),
 
+
     re_path(r'^error/denied/$', views_home.error_denied_view, name='error/denied'),
 
     re_path(r'^admin/users/$', views_admin.users_view, name='admin/users'),
@@ -43,6 +44,8 @@ urlpatterns = [
     re_path(r'^admin/import/$', views_admin.csv_import_view, name='admin/import'),
     re_path(r'^admin/export/$', views_admin.csv_export_view, name='admin/export'),
     re_path(r'^admin/backup/$', views_admin.backup_data, name='admin/backup'),
+
+    path('admin/', admin.site.urls),
 
     re_path(r'^message/list/$', views_message.list_view, name='message/list'),
     re_path(r'^message/new/$', views_message.new_view, name='message/new'),

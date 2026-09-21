@@ -470,20 +470,5 @@ div.dataTables_wrapper .dataTables_paginate .paginate_button,
         {% include "aboutus_modal.html" %}
 </body>
 
-<!-- Inside public/base.html -->
-<script>
-    document.addEventListener('visibilitychange', function () {
-        // Triggers when the tab or browser window is closed or hidden
-        if (document.visibilityState === 'hidden') {
-            const formData = new FormData();
-            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 
-            fetch('/logout/', {
-                method: 'POST',
-                body: formData,
-                keepalive: true // Ensures request completes even if the tab closes instantly
-            });
-        }
-    });
-</script>
 </html>
